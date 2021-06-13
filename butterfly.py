@@ -17,10 +17,15 @@ width = root.winfo_screenwidth()
 height = root.winfo_screenheight() - 70
 root.geometry(f"{width}x{height}+0+0")
 
-# Long live Solaire
-background_image = PhotoImage(file='butterfly_perfect1.png')
-background_label = Label(root, image=background_image)
-background_label.place(x=185, y=0, relwidth=1, relheight=.4)
+# Butterfly Wordart 
+wordart_image = PhotoImage(file='butterfly_perfect1.png')
+wordart_label = Label(root, image=wordart_image)
+wordart_label.place(x=185, y=0, relwidth=1, relheight=.4)
+
+# Butterfly cartoon
+butterfly_image = PhotoImage(file='butterfly_glitch.png')
+butterfly_label = Label(root, image=butterfly_image)
+butterfly_label.place(x=235, y=220, relwidth=1, relheight=.4)
 
 # Checking to see if there is a database and creating one if there is not 
 conn = sqlite3.connect('clothes.db')
@@ -29,10 +34,13 @@ c = conn.cursor()
 c.execute("""CREATE TABLE IF NOT EXISTS clothes (
 		cloth_name text,
 		section text,
-		season text,
+                pairs integer,
+		workout bool,
 		outerwear bool,
 		classic_number integer,
-		condition text
+                tempurature integer,
+                formality text,
+		condition integer
 		)""")
 
 # Create Update function to update a record
@@ -50,18 +58,24 @@ def update():
 	c.execute("""UPDATE clothes SET
 		cloth_name = :cloth_name,
 		section = :section,
-		season = :season,
+		pairs = :pairs,
+                workout = :workout,
 		outerwear = :outerwear,
 		classic_number = :classic_number,
+                tempurature = :tempurature,
+                formality = :formality,
 		condition = :condition 
 
 		WHERE cloth_name = :target_cloth""",
 		{
 		'cloth_name': cloth_name_editor.get(),
 		'section': section_editor.get(),
-		'season': season_editor.get(),
+		'pairs': pairs_editor.get(),
+                'workout': workout_editor.get(),
 		'outerwear': outerwear_editor.get(),
 		'classic_number': classic_number_editor.get(),
+                'tempurature': tempurature_editor.get(),
+                'formality': formality_editor.get(),
 		'condition': condition_editor.get(),
 		'target_cloth': target_cloth
 		})
@@ -88,8 +102,7 @@ def mark_dirty(con, generator, dirty_clothes):
     con.commit()
     generator.destoy()
 
-    
-# At this point, all this does it close the moment it is done updating.
+
 # Create Edit function to update a record (this creates a second window)
 def edit():
        global editor
@@ -110,9 +123,12 @@ def edit():
        #Create Global Variables for text box names
        global cloth_name_editor
        global section_editor
-       global season_editor
+       global pairs_editor
+       global workout_editor
        global outerwear_editor
        global classic_number_editor
+       global tempurature_editor
+       global formality_editor
        global condition_editor
        
        # Create Text Boxes
@@ -120,43 +136,58 @@ def edit():
        cloth_name_editor.grid(row=0, column=1, padx=20, pady=(10, 0))
        section_editor = Entry(editor, width=30)
        section_editor.grid(row=1, column=1)
-       season_editor = Entry(editor, width=30)
-       season_editor.grid(row=2, column=1)
+       pairs_editor = Entry(editor, width=30)
+       pairs_editor.grid(row=2, column=1)
+       workout_editor = Entry(editor, width=30)
+       workout_editor.grid(row=3, column=1)
        outerwear_editor = Entry(editor, width=30)
-       outerwear_editor.grid(row=3, column=1)
+       outerwear_editor.grid(row=4, column=1)
        classic_number_editor = Entry(editor, width=30)
-       classic_number_editor.grid(row=4, column=1)
+       classic_number_editor.grid(row=5, column=1)
+       tempurature_editor = Entry(editor, width=30)
+       tempurature_editor.grid(row=6, column=1)
+       formality_editor = Entry(editor, width=30)
+       formality_editor.grid(row=7, column=1)
        condition_editor = Entry(editor, width=30)
-       condition_editor.grid(row=5, column=1)
+       condition_editor.grid(row=8, column=1)
        
        # Create Text Box Labels
        cloth_name_label = Label(editor, text="Clothing Name")
        cloth_name_label.grid(row=0, column=0, pady=(10, 0))
        section_label = Label(editor, text="Section")
        section_label.grid(row=1, column=0)
-       season_label = Label(editor, text="Season")
-       season_label.grid(row=2, column=0)
-       outerwear_label = Label(editor, text="Outerwear")
-       outerwear_label.grid(row=3, column=0)
-       classic_outfit_label = Label(editor, text="Classic Number")
-       classic_outfit_label.grid(row=4, column=0)
-       condition_label = Label(editor, text="Condition")
-       condition_label.grid(row=5, column=0)
+       pairs_label = Label(editor, text="Pairs?")
+       pairs_label.grid(row=2, column=0)
+       workout_label = Label(editor, text="Workout?")
+       workout_label.grid(row=3, column=0)
+       outerwear_label = Label(editor, text="Outerwear?")
+       outerwear_label.grid(row=4, column=0)
+       classic_number_label = Label(editor, text="Classic number?")
+       classic_number_label.grid(row=5, column=0)
+       tempurature_label = Label(editor, text="Tempurature Level?")
+       tempurature_label.grid(row=6, column=0)
+       formality_label = Label(editor, text="Formality")
+       formality_label.grid(row=7, column=0)
+       condition_label = Label(editor, text="Condition?")
+       condition_label.grid(row=8, column=0)
        
        # Display the cloth to be edited
        for cloth in clothing:
         cloth_name_editor.insert(0, cloth[0])
         section_editor.insert(0, cloth[1])
-        season_editor.insert(0, cloth[2])
-        outerwear_editor.insert(0, cloth[3])
-        classic_number_editor.insert(0, cloth[4])
-        condition_editor.insert(0, cloth[5])
+        pairs_editor.insert(0, cloth[2])
+        workout_editor.insert(0, cloth[3])
+        outerwear_editor.insert(0, cloth[4])
+        classic_number_editor.insert(0, cloth[5])
+        tempurature_editor.insert(0, cloth[6])
+        formality_editor.insert(0, cloth[7])
+        condition_editor.insert(0, cloth[8])
        
        
        # Does nothing currently with the settings above 
        # Create a Save Button To Save edited record
        edit_btn = Button(editor, text="Update Cloth", command=update)
-       edit_btn.grid(row=6, column=0, columnspan=2, pady=10, padx=10, ipadx=145)
+       edit_btn.grid(row=9, column=0, columnspan=2, pady=10, padx=10, ipadx=145)
 
 # Redo the query with different random numbers
 def redo(con, generator):
@@ -260,36 +291,42 @@ def delete():
 # This is the initially open window
 # Create Submit Function For database
 def submit():
-	# Create a database or connect to one
-	conn = sqlite3.connect('clothes.db')
-	# Create cursor
-	c = conn.cursor()
-
-	# Insert Into Table
-	c.execute("INSERT INTO clothes VALUES (:cloth_name, :section, :season, :outerwear, :classic_number, :condition)",
-			{
-				'cloth_name': cloth_name.get(),
-				'section': section.get(),
-				'season': season.get(),
-				'outerwear': outerwear.get(),
-				'classic_number': classic_number.get(),
-				'condition': condition.get()
-			})
-
-
-	#Commit Changes
-	conn.commit()
-
-	# Close Connection 
-	conn.close()
-
-	# Clear The Text Boxes
-	cloth_name.delete(0, END)
-	section.delete(0, END)
-	season.delete(0, END)
-	outerwear.delete(0, END)
-	classic_number.delete(0, END)
-	condition.delete(0, END)
+        # Create a database or connect to one
+        conn = sqlite3.connect('clothes.db')
+        # Create cursor
+        c = conn.cursor()
+        
+        # Insert Into Table
+        c.execute("INSERT INTO clothes VALUES (:cloth_name, :section, :pairs, :workout, :outerwear, :classic_number, :tempurature, :formality, :condition)",
+        {
+            'cloth_name': cloth_name.get(),
+            'section': section.get(),
+            'pairs': pairs.get(),
+            'workout': workout.get(),
+            'outerwear': outerwear.get(),
+            'classic_number': classic_number.get(),
+            'tempurature': tempurature.get(),
+            'formality': formality.get(),
+            'condition': condition.get()
+        })
+        
+        
+        # Commit Changes
+        conn.commit()
+        
+        # Close Connection 
+        conn.close()
+        
+        # Clear The Text Boxes
+        cloth_name.delete(0, END)
+        section.delete(0, END)
+        pairs.delete(0, END)
+        workout.delete(0, END)
+        outerwear.delete(0, END)
+        classic_number.delete(0, END)
+        tempurature.delete(0, END)
+        formality.delete(0, END)
+        condition.delete(0, END)
 
 # Not very useful right now
 # Create Query Function
@@ -330,20 +367,26 @@ cloth_name = Entry(root, width=30)
 cloth_name.grid(row=0, column=1, padx=20, pady=(10, 0))
 section = Entry(root, width=30)
 section.grid(row=1, column=1)
-season = Entry(root, width=30)
-season.grid(row=2, column=1)
+pairs = Entry(root, width=30)
+pairs.grid(row=2, column=1)
+workout = Entry(root, width=30)
+workout.grid(row=3, column=1)
 outerwear = Entry(root, width=30)
-outerwear.grid(row=3, column=1)
+outerwear.grid(row=4, column=1)
 classic_number = Entry(root, width=30)
-classic_number.grid(row=4, column=1)
+classic_number.grid(row=5, column=1)
+tempurature = Entry(root, width=30)
+tempurature.grid(row=6, column=1)
+formality = Entry(root, width=30)
+formality.grid(row=7, column=1)
 condition = Entry(root, width=30)
-condition.grid(row=5, column=1)
+condition.grid(row=8, column=1)
 
 # Make remove_box and edit_box
 remove_box = Entry(root, width=30)
-remove_box.grid(row=8, column=1, pady=5)
+remove_box.grid(row=11, column=1, pady=5)
 edit_box = Entry(root, width=30)
-edit_box.grid(row=10, column=1, pady=5)
+edit_box.grid(row=13, column=1, pady=5)
 
 
 
@@ -352,18 +395,26 @@ cloth_name_label = Label(root, text="Clothing Name")
 cloth_name_label.grid(row=0, column=0, pady=(10, 0))
 section_label = Label(root, text="Section")
 section_label.grid(row=1, column=0)
-season_label = Label(root, text="Season")
-season_label.grid(row=2, column=0)
+pairs_label = Label(root, text="Pairs")
+pairs_label.grid(row=2, column=0)
+workout_label = Label(root, text="Workout")
+workout_label.grid(row=3, column=0)
 outerwear_label = Label(root, text="Outerwear")
-outerwear_label.grid(row=3, column=0)
+outerwear_label.grid(row=4, column=0)
 classic_number_label = Label(root, text="Classic Number")
-classic_number_label.grid(row=4, column=0)
+classic_number_label.grid(row=5, column=0)
+tempurature_label = Label(root, text="Tempurature")
+tempurature_label.grid(row=6, column=0)
+formality_label = Label(root, text="Formality")
+formality_label.grid(row=7, column=0)
 condition_label = Label(root, text="Condition")
-condition_label.grid(row=5, column=0)
+condition_label.grid(row=8, column=0)
+# There should be three spaces between the labels above and the bottom ones below. Between the bottom ones, there should be two spaces. 
+# And then again there should be two spaces between the ones below that 
 remove_box_label = Label(root, text="Delete Cloth Name")
-remove_box_label.grid(row=8, column=0, pady=5)
+remove_box_label.grid(row=11, column=0, pady=5)
 edit_box_label = Label(root, text="Edit Cloth Name")
-edit_box_label.grid(row=10, column=0, pady=5)
+edit_box_label.grid(row=13, column=0, pady=5)
 
 # Value to be passed into the generate clothes function for optional functionality
 # This outerwear_choice pyvar must be "getted" ie. outerwear_choice.get()
@@ -372,9 +423,9 @@ outerwear_choice.set(None)
 
 # Create Radio Buttons
 hoodie_radio = Radiobutton(root, text="Hoodie?", variable=outerwear_choice, value="Hoodie")
-hoodie_radio.grid(row=12, column=0, columnspan=2, pady=5, padx=10)
+hoodie_radio.grid(row=15, column=0, columnspan=2, pady=5, padx=10)
 jacket_radio = Radiobutton(root, text="Jacket?", variable=outerwear_choice, value="Jacket")
-jacket_radio.grid(row=13, column=0, columnspan=2, pady=5, padx=10)
+jacket_radio.grid(row=16, column=0, columnspan=2, pady=5, padx=10)
 
 # Ordering:
    # Add
@@ -385,19 +436,19 @@ jacket_radio.grid(row=13, column=0, columnspan=2, pady=5, padx=10)
 
 # Create Submit Button
 submit_btn = Button(root, text="Add Clothes To Database", command=lambda : submit())
-submit_btn.grid(row=6, column=0, columnspan=2, pady=10, padx=10, ipadx=100)
+submit_btn.grid(row=9, column=0, columnspan=2, pady=10, padx=10, ipadx=100)
 
 #Create A Delete Button
 delete_btn = Button(root, text="Remove Clothing from Database", command=lambda : delete())
-delete_btn.grid(row=7, column=0, columnspan=2, pady=10, padx=10, ipadx=75)
+delete_btn.grid(row=10, column=0, columnspan=2, pady=10, padx=10, ipadx=75)
 
 # Create an Edit Button
 edit_btn = Button(root, text="Edit Clothing", command=lambda : edit())
-edit_btn.grid(row=9, column=0, columnspan=2, pady=10, padx=10, ipadx=140)
+edit_btn.grid(row=12, column=0, columnspan=2, pady=10, padx=10, ipadx=140)
 
 # Create a Generate Button
 generate_btn = Button(root, text="Generate Clothes to Wear", command=lambda : generate(outerwear_choice.get()))
-generate_btn.grid(row=11, column=0, columnspan=2, pady=10, padx=10, ipadx=98)
+generate_btn.grid(row=14, column=0, columnspan=2, pady=10, padx=10, ipadx=98)
 
 
 
